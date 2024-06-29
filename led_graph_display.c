@@ -1,32 +1,36 @@
 /*
-    Project name : LED Graph Display
-    Modified Date: 08-06-2024
+    Project name : Arduino Uno LED Bar Graph Display
+    Modified Date: 29-06-2024
     Code by : Projectslearner
     Website : https://projectslearner.com/learn/arduino-uno-led-bar-graph-display
 */
 
-const int sensorPin = A1; // Set pin of the Photoresistor sensor
-const float GAMMA = 0.7;
-const float RL10 = 50;
+const int numLeds = 10;     // Number of LEDs in the bar graph
+int ledPins[numLeds] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11};  // Array of LED pins
+int sensorValue = 0;        // Variable to simulate sensor value
 
-void setup() 
-{
-  Serial.begin(9600); // Start serial communication
+void setup() {
+  // Initialize the LED pins as outputs
+  for (int i = 0; i < numLeds; i++) {
+    pinMode(ledPins[i], OUTPUT);
+  }
 }
 
-void loop() 
-{
-  // Read the Photoresistor sensor value
-  int sensorReading = analogRead(sensorPin);
+void loop() {
+  // Simulate sensor value incrementally
+  sensorValue = (sensorValue + 100) % 1024;  // Increment sensor value (simulated)
 
-  // Convert the analog value into lux value
-  float voltage = sensorReading / 1024.0 * 5.0;
-  float resistance = 2000.0 * voltage / (1.0 - voltage / 5.0);
-  float lux = pow(RL10 * 1e3 * pow(10.0, GAMMA) / resistance, (1.0 / GAMMA));
+  // Map sensor value to LED bar graph
+  int ledLevel = map(sensorValue, 0, 1023, 0, numLeds);
 
-  // Print lux value to Serial Monitor
-  Serial.print("Lux: ");
-  Serial.println(lux);
+  // Display the LED bar graph
+  for (int i = 0; i < numLeds; i++) {
+    if (i < ledLevel) {
+      digitalWrite(ledPins[i], HIGH);  // Turn on LEDs up to ledLevel
+    } else {
+      digitalWrite(ledPins[i], LOW);   // Turn off LEDs beyond ledLevel
+    }
+  }
 
-  delay(1000); // Adjust delay according to your needs
+  delay(500);  // Delay for visualization (adjust as needed)
 }
